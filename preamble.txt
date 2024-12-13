@@ -1,0 +1,86 @@
+     2    26  1700     1    92    72                       
+(I4,20X,10A1)
+   1                    I
+   2                    you
+   3                    we
+  11                    one
+  12                    two
+  18                    person
+  19                    fish
+  21                    dog
+  22                    louse
+  23                    tree
+  25                    leaf
+  28                    skin
+  30                    blood
+  31                    bone
+  34                    horn
+  39                    ear
+  40                    eye
+  41                    nose
+  43                    tooth
+  44                    tongue
+  47                    knee
+  48                    hand
+  51                    breast
+  53                    liver
+  54                    drink
+  57                    see
+  58                    hear
+  61                    die
+  66                    come
+  72                    sun
+  74                    star
+  75                    water
+  77                    stone
+  82                    fire
+  85                    path
+  86                    mountain
+  92                    night 
+  95                    full
+  96                    new
+ 100                    name
+                                     
+p
+b
+f
+v
+m
+w             
+8       
+t
+d
+s
+z
+c
+n
+r
+l       
+S
+Z       
+C
+j
+T       
+5
+y
+k
+g
+x
+N
+q                     
+X
+h
+7
+L
+4
+G
+!       
+i   
+e
+E
+3
+a
+u
+o
+       
+                                     
