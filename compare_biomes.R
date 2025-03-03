@@ -1,4 +1,4 @@
-x <- read.table(file="C:/Wichmann/ASJP/Homelands/Homeland2025/diffusion_events_annotated.txt", header=TRUE, sep="\t", quote="")
+x <- read.table(file="diffusion_events_annotated.txt", header=TRUE, sep="\t", quote="")
 b4 <- x$biome4_names
 b98 <- x$biome98_names
 b98 <- gsub(" $", "", b98)
