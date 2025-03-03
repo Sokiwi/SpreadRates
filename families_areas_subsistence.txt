@@ -1,0 +1,426 @@
+family	area	subsistence
+Abinomn	Papunesia	HG-SAGO
+Abkhaz-Adyge	Eurasia	AGR
+Abun	Papunesia	AGR
+Adai	North America	AGR
+Aewa	South America	NA
+Afro-Asiatic	Africa	AGR
+Aikanã	South America	AGR
+Ainu	Eurasia	HG
+Algic	North America	HG
+Alsea-Yaquina	North America	HG
+Ambakich	Papunesia	HG-SAGO
+Amto-Musan	Papunesia	HG-SAGO
+Andaqui	South America	AGR
+Andoque	South America	AGR
+Anem	Papunesia	AGR
+Angan	Papunesia	AGR
+Anim	Papunesia	HG-SED, HG-SAGO
+ApMa	Papunesia	HG-SAGO
+Arafundi	Papunesia	HG-SAGO
+Araucanian	South America	AGR
+Arawakan	South America	AGR
+Arawan	South America	AGR, HG
+Arutani	South America	HG
+Asabano	Papunesia	AGR
+Atacame	South America	AGR
+Atakapa	North America	HG
+Athabaskan-Eyak-Tlingit	North America	HG
+Atlantic-Congo	Africa	AGR
+Austroasiatic	Eurasia	AGR
+Austronesian	Papunesia	AGR
+Aymaran	South America	AGR
+Baibai-Fas	Papunesia	HG-SAGO
+Baining	Papunesia	AGR
+Bangime	Africa	AGR
+Barbacoan	South America	AGR
+Basque	Eurasia	AGR
+Bayono-Awbono	Papunesia	HG-SAGO
+Beothuk	North America	HG
+Berta	Africa	AGR
+Betoi-Jirara	South America	HG
+Bilua	Papunesia	AGR
+BlueNileMao	Africa	AGR
+Bogaya	Papunesia	AGR
+Bogia	Papunesia	AGR
+Boran	South America	AGR
+Border	Papunesia	HG-SAGO
+Bororoan	South America	HG
+Bosavi	Papunesia	HG-SAGO
+BulakaRiver	Papunesia	HG-SAGO
+Bunaban	Australia	HG
+Burmeso	Papunesia	HG-SAGO
+Burushaski	Eurasia	AGR
+Caddoan	North America	HG, AGR
+Cahuapanan	South America	AGR
+Camsá	South America	AGR
+Candoshi-Shapra	South America	AGR
+Canichana	South America	HG
+Cariban	South America	HG
+Cayubaba	South America	AGR
+Cayuse	North America	HG
+CentralSudanic	Africa	AGR
+Chapacuran	South America	AGR
+Charruan	South America	HG
+Chibchan	South America	AGR
+Chicham	South America	AGR
+Chimakuan	North America	HG
+Chimariko	North America	HG
+Chinookan	North America	HG
+Chiquitano	South America	AGR
+Chitimacha	North America	AGR
+Chocoan	South America	AGR
+Chonan	South America	HG
+Chono	South America	HG
+Chukotko-Kamchatkan	Eurasia	HG
+Chumashan	North America	HG-SED
+Coahuilteco	North America	HG
+Cochimi-Yuman	North America	HG
+Cofán	South America	HG, AGR
+Comecrudan	North America	HG
+Coosan	North America	HG
+Cotoname	North America	HG
+Cuitlatec	North America	AGR
+Culli	South America	AGR
+Dagan	Papunesia	HG-SED
+Dajuic	Africa	AGR
+Damal	Papunesia	HG
+Dem	Papunesia	AGR
+Dibiyaso	Papunesia	HG-SED
+Dizoid	Africa	AGR
+Dogon	Africa	AGR
+Doso-Turumsa	Papunesia	HG-SED
+Dravidian	Eurasia	AGR
+Duna	Papunesia	AGR
+EastBird'sHead	Papunesia	AGR
+EasternDaly	Australia	HG
+EasternJebel	Africa	AGR
+EasternTrans-Fly	Papunesia	HG-SED
+EastKutubu	Papunesia	HG-SAGO
+EastStrickland	Papunesia	HG-SAGO
+Elamite	Eurasia	AGR
+Eleman	Papunesia	HG-SED
+Elseng	Papunesia	HG-SAGO
+Eskimo-Aleut	North America	HG
+Esselen	North America	HG
+Etruscan	Eurasia	AGR
+Fasu	Papunesia	HG-SAGO
+Fulniô	South America	AGR
+Furan	Africa	AGR
+Gaagudju	Australia	HG
+Garrwan	Australia	HG
+GeelvinkBay	Papunesia	HG-SAGO
+Giimbiyu	Australia	HG
+Goilalan	Papunesia	AGR
+GreatAndamanese	Eurasia	HG
+GreaterKwerba	Papunesia	HG-SED, HG-SAGO
+Guachi	South America	HG
+Guahiboan	South America	HG
+Guaicurian	North America	HG
+Guaicuruan	South America	HG
+Guamo	South America	HG
+Guató	South America	HG
+Gule	Africa	AGR
+Gumuz	Africa	AGR
+Gunwinyguan	Australia	HG
+Guriaso	Papunesia	HG-SAGO
+Hadza	Africa	HG
+Haida	North America	HG
+Harakmbut	South America	AGR
+Hatam-Mansim	Papunesia	AGR
+Hattic	Eurasia	AGR
+Heibanic	Africa	AGR
+Hibito-Cholon	South America	AGR
+Hmong-Mien	Eurasia	AGR
+Hruso	Eurasia	AGR
+Huarpean	South America	AGR
+Huavean	North America	AGR-FISH
+Huitotoan	South America	AGR
+Hurro-Urartian	Eurasia	AGR
+Iberian	Eurasia	AGR
+Ijoid	Africa	AGR
+Inanwatan	Papunesia	HG-SAPO
+Indo-European	Eurasia	AGR
+Iroquoian	North America	AGR
+Irántxe-Münkü	South America	AGR
+Itonama	South America	AGR
+IwaidjanProper	Australia	HG
+Jalaa	Africa	AGR
+Japonic	Eurasia	AGR
+Jarawa-Onge	Eurasia	HG
+Jarrakan	Australia	HG
+Jicaquean	North America	AGR
+Jirajaran	South America	AGR
+Kadugli-Krongo	Africa	AGR
+KakiAe	Papunesia	HG-SAGO
+Kakua-Nukak	South America	HG
+Kalapuyan	North America	HG
+Kamakanan	South America	AGR
+Kamula-Elevala	Papunesia	HG-SAGO
+Kanoê	South America	AGR
+Kapori	Papunesia	HG-SAGO
+Karami	Papunesia	NODATA
+Karankawa	North America	HG
+Kariri	South America	HG
+Karok	North America	HG
+Kartvelian	Eurasia	AGR
+Katla-Tima	Africa	AGR
+Katukinan	South America	HG
+Kaure-Narau	Papunesia	HG-SAGO
+Kawesqar	South America	HG
+Kayagaric	Papunesia	HG-SED
+Kehu	Papunesia	HG-SAGO
+Kembra	Papunesia	HG-SAGO
+Kenaboi	Eurasia	HG
+Keram	Papunesia	HG-SAGO
+Keresan	North America	AGR
+Khoe-Kwadi	Africa	HG
+Kibiri	Papunesia	HG-SAGO
+Kimki	Papunesia	HG-SAGO
+Kiowa-Tanoan	North America	AGR
+Kiwaian	Papunesia	HG-SED
+Klamath-Modoc	North America	HG
+Koiarian	Papunesia	AGR, HG-SED
+Kol(PapuaNewGuinea)	Papunesia	AGR
+Kolopom	Papunesia	AGR
+Koman	Africa	AGR
+Konda-Yahadian	Papunesia	HG-SED
+Koreanic	Eurasia	AGR
+Kosadle	Papunesia	HG-SED
+Kresh-Aja	Africa	AGR
+Kru	Africa	AGR
+Kujarge	Africa	HG
+Kuliak	Africa	AGR
+Kunama	Africa	AGR
+Kungarakany	Australia	HG
+Kunza	South America	AGR
+Kuot	Papunesia	AGR
+Kusunda	Eurasia	HG
+Kutenai	North America	HG
+Kwalean	Papunesia	HG-SED
+Kwaza	South America	AGR
+Kwomtari-Nai	Papunesia	HG-SED
+Kxa	Africa	HG
+Laal	Africa	PAS
+Lafofa	Africa	AGR
+LakesPlain	Papunesia	HG-SED
+Laragia	Australia	HG
+Lavukaleve	Papunesia	AGR
+Leco	South America	AGR
+LeftMay	Papunesia	HG-SED
+Lencan	North America	AGR
+Lengua-Mascoy	South America	HG
+Lepki-Murkim	Papunesia	HG-SAGO
+Limilngan-Wulna	Australia	HG
+LowerSepik	Papunesia	HG-SAGO
+Lule	South America	HG
+Maban	Africa	AGR
+Maiduan	North America	HG
+Mailuan	Papunesia	AGR
+Mairasic	Papunesia	AGR
+Mande	Africa	AGR
+Mangarrayi-Maran	Australia	HG
+Maningrida	Australia	HG
+Manubaran	Papunesia	AGR
+Maratino	North America	HG
+Marori	Papunesia	HG-SAGO
+Marrku-Wurrugu	Australia	HG
+Massep	Papunesia	HG-SED
+Mataguayan	South America	HG
+Matanawí	South America	HG
+MatoGrossoArára	South America	AGR
+Mawes	Papunesia	AGR
+Mayan	North America	AGR
+Maybrat-Karon	Papunesia	AGR
+Meroitic	Africa	AGR
+Mimi-Gaudefroy	Africa	AGR
+Minkin	Australia	HG
+Mirndi	Australia	HG
+Misumalpan	North America	AGR
+Miwok-Costanoan	North America	HG
+Mixe-Zoque	North America	AGR
+Mochica	South America	AGR
+Molale	North America	HG
+Molof	Papunesia	HG-SAGO
+Mombum-Koneraw	Papunesia	AGR
+Mongolic-Khitan	Eurasia	AGR
+Mor(BomberaiPeninsula)	Papunesia	HG-SAGO
+Morehead-Wasur	Papunesia	AGR
+Mosetén-Chimané	South America	AGR
+Movima	South America	HG
+Mpur	Papunesia	AGR
+Muniche	South America	AGR
+Mure	South America	HG
+Muskogean	North America	AGR
+Máku	South America	HG
+Naduhup	South America	HG
+Nakh-Daghestanian	Eurasia	AGR
+Nambiquaran	South America	HG, AGR
+Namla-Tofanma	Papunesia	HG-SAGO
+Nara	Africa	AGR
+NarrowTalodi	Africa	AGR
+Natchez	North America	AGR
+Ndu	Papunesia	HG-SAGO, HG-SED
+Nihali	Eurasia	AGR
+Nilotic	Africa	PAS
+Nimboranic	Papunesia	HG-SED
+Nivkh	Eurasia	HG-FISH
+North-EasternTasmanian	Australia	HG
+NorthBougainville	Papunesia	AGR
+NorthernDaly	Australia	HG
+NorthHalmahera	Papunesia	AGR
+Nubian	Africa	AGR
+Nuclear-Macro-Je	South America	AGR, HG
+NuclearTorricelli	Papunesia	AGR
+NuclearTransNewGuinea	Papunesia	HG-SAGO
+Nyimang	Africa	AGR
+Nyulnyulan	Australia	HG
+Odiai	Papunesia	HG-SAGO
+Omurano	South America	AGR
+Ongota	Africa	AGR
+Oti	South America	HG
+Otomaco-Taparita	South America	AGR
+Otomanguean	North America	HG
+OysterBay-BigRiver-LittleSwanport	Australia	HG
+Pahoturi	Papunesia	HG-SAGO
+Palaihnihan	North America	HG
+Pama-Nyungan	Australia	HG
+Pankararú	South America	AGR
+Pano-Tacanan	South America	AGR
+Papi	Papunesia	HG-SAGO
+Pauwasi	Papunesia	HG-SAGO
+Pawaia	Papunesia	HG-SED
+Payagua	South America	HG
+Peba-Yagua	South America	AGR
+Pele-Ata	Papunesia	AGR
+Piawi	Papunesia	AGR
+Pirahã	South America	HG
+Pomoan	North America	HG
+Puelche	South America	HG
+Puinave	South America	AGR
+Pumé	South America	HG
+Puquina	South America	AGR
+Purari	Papunesia	HG-SAGO
+Puri-Coroado	South America	HG
+Pyu	Papunesia	HG-SED
+Páez	South America	AG
+Quechuan	South America	AGR
+Ramanos	South America	NODATA
+Rashad	Africa	AGR
+Ramu	Papunesia	HG-SAGO
+Sahaptian	North America	HG
+Saharan	Africa	AGR
+Saliban	South America	AGR
+Salinan	North America	HG
+Salishan	North America	HG-FISH
+Sandawe	Africa	AGR
+Sapé	South America	HG
+Sause	Papunesia	HG-SAGO
+Savosavo	Papunesia	AGR
+Sechuran	South America	AGR
+Senagi	Papunesia	HG-SAGO
+Sentanic	Papunesia	HG-SAGO
+Sepik	Papunesia	HG-SAGO
+Seri	North America	HG
+Shabo	Africa	HG
+Shastan	North America	HG
+ShomPeng	Eurasia	HG
+Siamou	Africa	AGR
+Sino-Tibetan	Eurasia	AGR
+Siouan	North America	HG
+Siuslaw	North America	HG
+Sko	Papunesia	HG-SAGO, HG-SED
+Somahai	Papunesia	HG-SAGO
+Songhay	Africa	AGR
+South-EasternTasmanian	Australia	HG
+SouthBird'sHeadFamily	Papunesia	HG-SED, HG-SAGO
+SouthBougainville	Papunesia	AGR
+SouthernDaly	Australia	HG
+SouthOmotic	Africa	AGR
+Suki-Gogodala	Papunesia	HG-SAGO
+Sulka	Papunesia	AGR
+Sumerian	Eurasia	AGR
+Surmic	Africa	AGR
+Ta-Ne-Omotic	Africa	AGR
+Tabo	Papunesia	HG-SED
+Tai-Kadai	Eurasia	AGR
+Taiap	Papunesia	HG-SAGO
+Takelma	North America	HG
+Tallán	South America	AGR
+Tamaic	Africa	AGR
+Tambora	Papunesia	AGR
+Tanahmerah	Papunesia	HG-SAGO
+Tangkic	Australia	HG
+Tarascan	North America	AGR
+Taruma	South America	NODATA
+Taulil-Butam	Papunesia	AGR
+Taushiro	South America	HG, AGR
+Teberan	Papunesia	AGR
+Temeinic	Africa	AGR
+Tequistlatecan	North America	AGR
+Ticuna-Yuri	South America	AGR
+Timor-Alor-Pantar	Papunesia	AGR
+Timote-Cuica	South America	AGR
+Timucua	North America	HG
+Tinigua	South America	AGR
+Tiwi	Australia	HG
+Tonkawa	North America	HG
+Tor-Orya	Papunesia	HG-SAGO
+Totonacan	North America	AGR
+Touo	Papunesia	AGR
+Trumai	South America	HG
+Tsimshian	North America	HG
+Tucanoan	South America	AGR
+Tungusic	Eurasia	PAS
+Tunica	North America	AGR
+Tupian	South America	AGR
+Turama-Kikori	Papunesia	AGR
+Turkic	Eurasia	AGR
+Tuu	Africa	HG
+Tuxá	South America	AGR
+Ulmapo	Papunesia	HG-SAGO
+Umbugarla	Australia	HG
+Uralic	Eurasia	AGR
+Urarina	South America	AGR
+Uru-Chipaya	South America	HG, AGR
+Usku	Papunesia	HG-SAGO
+Uto-Aztecan	North America	AGR
+Vilela	South America	HG
+Wadjiginy	Australia	HG
+Wageman	Australia	HG
+Wakashan	North America	HG-FISH
+Walioic	Papunesia	HG-SED
+Waorani	South America	HG
+Warao	South America	HG
+Washo	North America	HG
+WestBird'sHead	Papunesia	AGR
+WestBomberai	Papunesia	AGR
+WesternDaly	Australia	HG
+WesternTasmanian	Australia	HG
+Wintuan	North America	HG
+Wiru	Papunesia	AGR
+Worrorran	Australia	HG
+Xincan	North America	AGR
+Xukurú	South America	HG
+Yale	Papunesia	HG-SAGO
+Yam	Papunesia	AGR
+Yana	North America	HG
+Yangmanic	Australia	HG
+Yanomamic	South America	HG
+Yareban	Papunesia	AGR
+Yawa-Saweru	Papunesia	AGR
+Yele	Papunesia	AGR
+Yeniseian	Eurasia	HG
+Yerakai	Papunesia	HG-SAGO
+Yetfa	Papunesia	HG-SAGO
+Yokutsan	North America	HG-FISH
+Yuat	Papunesia	HG-SAGO
+Yuchi	North America	AGR
+Yukaghir	Eurasia	HG
+Yuki-Wappo	North America	HG
+Yuracaré	South America	AGR
+Yurumanguí	South America	AGR
+Yámana	South America	HG
+Zamucoan	South America	HG
+Zaparoan	South America	AGR
+Zuni	North America	AGR
