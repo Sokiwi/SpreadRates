@@ -7,13 +7,17 @@ library(sf)  # for reading the shape files
 # library(rgeos)  # for checking if a point is within a polygon # no longer maintained
 library(sp)  #  point.in.polygon()
 library(geosphere)  # distHaversine()
+library(swaRm)  # chull_area()
+library(tibble)
 
 # This produces a file called diffusion_events_annotated.txt from diffusion_events.txt
-# Given two homeland coordinates and dates for each, get the following
+# Given two homeland coordinates and dates for each, add the following
 # information about diffusion event:
 # - distance as the crow flies from A to B, |AB|
-# - speed (distance/time difference)
-# - estimate of error on speed, err_speed
+# - estimate of error on distance
+# - estimate of error on time differences
+# - velocity (distance/time difference)
+# - estimate of error on velocity, err_vel
 # - world area	
 # - subsistence	
 # - bearing
@@ -41,47 +45,193 @@ if (length(remove) > 0) {
 # save(dea, file="dea.RData")
 
 # get errors on homeland estimates for mothers and daughters
-# takes around 2 mins
-g <- read.table(file="glottolog_classification_strings.txt", header=TRUE, sep="\t", quote="")
-error <- function(area) .4182 * sqrt(area) + 77.075
-err_home_mo <- c()
-err_home_da <- c()
-area_mo <- c()
-area_da <- c()
-for (i in 1:nrow(dea)) {
-  mo <- dea$mo[i]
-  w_g_mo <- grep(paste0("^", mo), g$Classification)
-  lons_mo <- g$lon[w_g_mo]
-  lats_mo <- g$lat[w_g_mo]
-  na_lons_mo <- which(is.na(lons_mo))
-  na_lats_mo <- which(is.na(lats_mo))
-  if (length(na_lons_mo) > 0 | length(na_lats_mo) > 0) {
-    nas <- unique(c(na_lons_mo,na_lats_mo))
-    lons_mo <- lons_mo[-nas]
-    lats_mo <- lats_mo[-nas]
-  }
-  coors_mo <- data.frame(lons_mo,lats_mo)
-  area_mo <- areaPolygon(coors_mo)/1000000
-  err_home_mo[i] <- round(error(area_mo))
-  da <- dea$da[i]
-  w_g_da <- grep(paste0("^", da), g$Classification)
-  lons_da <- g$lon[w_g_da]
-  lats_da <- g$lat[w_g_da]
-  na_lons_da <- which(is.na(lons_da))
-  na_lats_da <- which(is.na(lats_da))
-  if (length(na_lons_da) > 0 | length(na_lats_da) > 0) {
-    nas_da <- unique(c(na_lons_da,na_lats_da))
-    lons_da <- lons_da[-nas]
-    lats_da <- lats_da[-nas]
-  }
-  coors_da <- data.frame(lons_da,lats_da)
-  area_da <- areaPolygon(coors_da)/1000000
-  err_home_da[i] <- round(error(area_da))
-}
-# save(err_home_mo, file="err_home_mo.RData")
-# save(err_home_da, file="err_home_da.RData")
+# in the following two functions the intercepts and slopes come
+# from the script error_bar_homelands
 
-# sum_err_home <- err_home_mo + err_home_da
+# formula for estimating error from area of language group for BT method
+get.error.bt <- function(area) {
+  # error.bt = slope.bt * area + intercept.bt
+  error.bt <- 0.0002481033 * area + 108.947
+  return(error.bt)
+}
+
+# formula for estimating error from area of language group for MD method
+get.error.md <- function(area) {
+  # error.md = slope.md * area + intercept.md
+  error.md <- 0.0002619432 * area + 111.4923
+  return(error.md)
+}
+
+# given a classification string access the pruned ASJP database,
+# extract coordinates for the languages, compute the area, and then the 
+# expected error
+
+# extracting coordinates requires the database
+db <- read.table(file="listss20_pruned_updated.tab", sep="\t", header=TRUE, 
+                 quote = "", na.strings="", comment.char="")
+
+# function for calculating the area of a convex hull (envelope) of a set of 
+# geographical coordinates (in square kilometers)
+area <- function(x, y) {  # x and y are vectors of longitudes and latitudes
+  chull_area(x, y, geo=TRUE)/1000000
+}
+
+# function for computing the area and then the error
+get.exp.err <- function(clstring, method) {
+  w_clstring <- grep(clstring, db$hh, fixed=TRUE)
+  if (length(w_clstring)==0) {
+    return(NA)
+  }
+  lons <- db$lon[w_clstring]
+  lats <- db$lat[w_clstring]
+  a <- area(lons, lats)
+  if(method=="MD") {
+    return(get.error.md(a))
+  }
+  if(method=="BT") {
+    return(get.error.bt(a))
+  }
+}
+
+# given two homelands get the error on them using get.exp.err
+# (which takes the method as a variable),
+# and subsequently an error on the distance;
+# mo and da are classification strings;
+# the function takes as variable a row in the diffusion_events.txt file
+# or a data frame based on this file, such as dea
+# (dea is assumed to be present in memory)
+
+err.bar.dist <- function(i) {
+  mo <- dea$mo[i]
+  method.mo <- dea$method_mo[i]
+  da <- dea$da[i]
+  method.da <- dea$method_da[i]
+  lon.mo <- dea$lon_mo[i]
+  lat.mo <- dea$lat_mo[i]
+  lon.da <- dea$lon_da[i]
+  lat.da <- dea$lat_da[i]
+  exp.err.mo <- get.exp.err(mo, method.mo)
+  exp.err.da <- get.exp.err(da, method.da)
+  dist.mo.da <- distHaversine(c(lon.mo,lat.mo),c(lon.da,lat.da))/1000
+  if (is.na(exp.err.mo) | is.na(exp.err.da)) {
+    dist.min <- NA
+    dist.max <- NA
+    print("NA case found")  # not expected to happen
+    return(c(dist.mo.da,dist.min,dist.max))
+  }
+  dist.max <- exp.err.mo + exp.err.da + dist.mo.da
+  if (dist.mo.da >= exp.err.mo + exp.err.da) {  # non-overlapping
+    dist.min <- dist.mo.da - (exp.err.mo + exp.err.da)
+  } else {  # overlapping or one inside the other
+    dist.min <- 0
+  }
+  return(c(dist.mo.da,dist.min,dist.max))
+}
+
+# run all diffusion events, filling the below vectors for distances and error bars
+distance <- c()
+dist_min <- c()
+dist_max <- c()
+
+for (i in 1:nrow(dea)) {
+  if(i %% 100 == 0) {
+    cat("doing", i, "out of", nrow(dea), "\n")
+  }
+  res <- err.bar.dist(i)
+  distance[i] <- res[1]
+  dist_min[i] <- res[2]
+  dist_max[i] <- res[3]
+}
+
+# save(distance, file="distance.RData")
+# save(dist_min, file="dist_min.RData")
+# save(dist_max, file="dist_max.RData")
+
+# get error bars on dates for mothers and daughters using the plus/minus 29%
+# error on calibration in Holman et al.
+err.bar.date <- function(i) {
+  BP.mo <- dea$BP_mo[i]
+  BP.da <- dea$BP_da[i]
+  BP.mo.from <- round(BP.mo + BP.mo * .29, 0)
+  BP.mo.to <- round(BP.mo - BP.mo * .29, 0)
+  if (!is.na(BP.mo.to) & BP.mo.to < 0) {BP.mo.to <- 0}
+  BP.da.from <- round(BP.da + BP.da * .29, 0)
+  BP.da.to <- round(BP.da - BP.da * .29, 0)
+  if (!is.na(BP.da.to) & BP.da.to < 0) {BP.da.to <- 0}
+  return(c(BP.mo.from, BP.mo.to, BP.da.from, BP.da.to))
+}
+
+BP_mo_from <- c()
+BP_mo_to <- c()
+BP_da_from <- c()
+BP_da_to <- c()
+
+# run all diffusion events and fill the above vectors for error bars on dates
+for (i in 1:nrow(dea)) {
+  res <- err.bar.date(i)
+  BP_mo_from[i] <- res[1]
+  BP_mo_to[i] <- res[2]
+  BP_da_from[i] <- res[3]
+  BP_da_to[i] <- res[4]
+}
+
+# save(BP_mo_from, file="BP_mo_from.RData")
+# save(BP_mo_to, file="BP_mo_to.RData")
+# save(BP_da_from, file="BP_da_from.RData")
+# save(BP_da_to, file="BP_da_to.RData")
+
+# compute speed and error bars on speed;
+# this uses propagation of uncertainties for division
+# where errV^2 = errD^2 + errT^2,
+# respectively error on velocity, distance, and time
+err.bar.speed <- function(i) {
+  D <- distance[i]
+  # when areas of uncertainty are overlapping the minimal distance is zero
+  # in this situation the proportion of possible error to distance can be large 
+  # or infinite, but in practice the measurement on distance is probably
+  # going to be quite accurate, so complications in the calculation of
+  # propagation of uncertainty are avoided by simply setting the error to zero
+  if (dist_min[i]==0) {
+    errD <- 0
+  } else {
+    abs.errD <- (dist_max[i] - dist_min[i])/2
+    errD <- abs.errD/D
+  }
+  if (is.na(dea$BP_mo[i]) | is.na(dea$BP_da[i])) {
+    return(c(NA, NA, NA))
+  }
+  T <- dea$BP_mo[i] - dea$BP_da[i]
+  if (T <= 0) {
+    return(c(NA, NA, NA))
+  }
+  errT <- .29
+  V <- D/T
+  errV <- V * sqrt(errD^2 + errT^2)
+  V.from <- V - errV
+  if (V.from < 0) {
+    V.from <- 0
+  }
+  V.to <- V + errV
+  return(c(V, V.from, V.to, errV))
+}
+
+speed <- c()
+speed_from <- c()
+speed_to <- c()
+speed_err <- c()
+
+# run all diffusion events and fill the above vectors for error bars on speed
+for (i in 1:nrow(dea)) {
+  res <- err.bar.speed(i)
+  speed[i] <- res[1]
+  speed_from[i] <- res[2]
+  speed_to[i] <- res[3]
+  speed_err[i] <- res[4]
+}
+
+# save(speed, file="speed.RData")
+# save(speed_from, file="speed_from.RData")
+# save(speed_to, file="speed_to.RData")
 
 # for each diffusion event, make a list of stations between A and B
 # geosphere also has distHaversine for the GCD
@@ -97,17 +247,6 @@ lines <- list()
 for (i in 1:nrow(dea)) {
   lines[[i]] <- make_line(dea$lat_mo[i], dea$lon_mo[i], dea$lat_da[i], dea$lon_da[i])
 }
-
-# distance as the crow flies from A to B, |AB|
-distance <- c()
-for (i in 1:nrow(dea)) {
-  distance[i] <- distHaversine(c(dea$lon_mo[i], dea$lat_mo[i]), c(dea$lon_da[i], dea$lat_da[i]))/1000
-}
-# save(distance, file="distance.RData")
-
-# speed
-speed <- round(distance/(dea$BP_mo - dea$BP_da), 3)
-# save(speed, file="speed.RData")
 
 # read prepared data on families, areas, and subsistence from Hammarström
 fas <- read.table(file="families_areas_subsistence.txt", header=TRUE, 
@@ -215,14 +354,14 @@ for (i in 1:nrow(dea)) {
    perc_b4[i] <- NA
  }
 }
-save(perc_b4, file="perc_b4.RData")
-save(biome4, file="biome4.RData")
+# save(perc_b4, file="perc_b4.RData")
+# save(biome4, file="biome4.RData")
 
 # function given two geographical coordinates find the proportion of 
 # the type of modern biome that most of the connecting line goes through
 # NA output means that there is no movement
 # Olson & Dinerstein (1998) biomes for WWF
-shape <- read_sf(dsn = "C:/Wichmann/ASJP/Homelands/Homeland2025/official_teow/official", 
+shape <- read_sf(dsn = "E:/Wichmann/ASJP/Homelands/Homeland2025/official_teow/official", 
                  layer = "wwf_terr_ecos")
 biome98finder <- function(i) {
   points <- lines[[i]]
@@ -296,8 +435,8 @@ for (i in 1:nrow(dea)) {
   biome98[i] <- biome98out[[1]]
   perc_b98[i] <- biome98out[[2]]
 }
-save(biome98, file="biome98.RData")
-save(perc_b98, file="perc_b98.RData")
+# save(biome98, file="biome98.RData")
+# save(perc_b98, file="perc_b98.RData")
 
 # mean altitude, rugosity, and net primary productivity across stations 
 # from A to B and the same X stations between as for biomes
@@ -311,12 +450,12 @@ for (i in 1:nrow(dea)) {
   rugosity[i] <- round(mean(pcd_out$rugosity),2)
   npp[i] <- round(mean(pcd_out$npp),2)
 }
-save(altitude, file="altitude.RData")
-save(rugosity, file="rugosity.RData")
-save(npp, file="npp.RData")
+# save(altitude, file="altitude.RData")
+# save(rugosity, file="rugosity.RData")
+# save(npp, file="npp.RData")
 
 biome4_names <- biome4
-save(biome4_names, file="biome4_names.RData")
+# save(biome4_names, file="biome4_names.RData")
 biome4 <- c()
 biome4_key <- get_biome_classes("Example")
 for (i in 1:length(biome4_names)) {
@@ -331,7 +470,7 @@ for (i in 1:length(biome4_names)) {
     biome4[i] <- NA
   }
 }
-save(biome4, file="biome4.RData")
+# save(biome4, file="biome4.RData")
 
 biome98_names <- c()
 biome98_key <- read.table(file="key biomes98.txt", header=TRUE, sep="\t")
@@ -347,15 +486,17 @@ for (i in 1:length(biome98)) {
     biome98_names[i] <- NA
   }
 }
-save(biome98_names, file="biome98_names.RData")
+# save(biome98_names, file="biome98_names.RData")
 
-# in case only some elements were updated as others were saved from 
+# in case only some elements were updated and others were saved from 
 # previous sessions the saved ones can be loaded as needed
 load("dea.RData")
-load("err_home_mo.RData")
-load("err_home_da.RData")
 load("distance.RData")
+load("dist_min.RData")
+load("dist_max.RData")
 load("speed.RData")
+load("speed_from.RData")
+load("speed_to.RData")
 load("area.RData")
 load("subsistence.RData")
 load("bearing.RData")
@@ -369,7 +510,8 @@ load("altitude.RData")
 load("rugosity.RData")
 load("npp.RData")
 
-dea_full <- data.frame(dea, err_home_mo, err_home_da, distance, speed, area, subsistence, bearing, 
+dea_full <- data.frame(dea, distance, dist_min, dist_max, 
+                       speed, speed_from, speed_to, area, subsistence, bearing, 
                        biome4, biome4_names, perc_b4, biome98, biome98_names, 
                        perc_b98, altitude, rugosity, npp)
 
