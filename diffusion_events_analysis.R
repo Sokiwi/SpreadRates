@@ -2,47 +2,31 @@ library(cartography)  # carto.pal
 library(RColorBrewer)  # for making plots of diffusion rates in different biomes
 library(ddalpha)
 
-# function looks at periods of Y years from "lowest" (default is
-# 6000 BP to present 
+# the function as() looks at periods of Y years from "lowest" (default is
+# 6000 BP to present)
 # within each period it checks the speed of active diffusion events
 # and then takes means and medians, outputting a file with that and N
-# Can plot world, areas, biomes
+# Can plot make plots for areas and biomes
 
 # areas are: Africa, Australia, Austronesian, Eurasia, North America, Papuan, South America
 
 # plots and analyses
-# mean rates across areas
-as(Y=1, lowest=7000, loess.span=.1, upper=2, present=300, what="areas")  # Fig. 1
-# ratio of EW to SW movements across areas
-# presently this only works when the corresponding code is run from inside the function
-as(what="biomes")  # Fig. 4
-as(what="continuous_variables")  # prints correlations between speed and some other variables,
-as("bearings_areas")  # Fig. S1
-# ratio of EW to SW movements across subsistence
-# presently this only works when the corresponding code is run from inside the function
-# mean rates across subsistence patterns
-as(Y=1, lowest=5000, loess.span=.2, upper=0.8, present=300, what="subsistence")  # Fig. S1
-as("bearings_subsistence")  # Fig. S2
-# as("latitudes")
-# as("area")
-
-# examples of other plots and analyses (not used)
-# as(Y=1, lowest=7000, loess.span=.1, what="areas", upper=10, present=0)  # means across world areas
-# as(Y=1, lowest=7000, loess.span=.1, what="world")  # mean and median world, not used
-# as(300, 5000, 1, "world")  # mean and median world with fitting, not used
-# specifically: altitude, rugosity, and net primary productivity
-# as(Y=1, lowest=7000, loess.span=.1, upper=5, present=200, what="areas")
-# as(Y=1, lowest=7000, loess.span=.2, what="area", upper=1, repetitions=10, area="Africa")
-# as(Y=1, lowest=5000, loess.span=.2, what="area", upper=6, repetitions=1, area="Eurasia")
-# as(Y=1, lowest=6000, loess.span=.2, what="area", upper=2, repetitions=1, "South America")
-# as(Y=1, lowest=6000, loess.span=.2, what="area", upper=2, repetitions=1, "Austronesian")
-# as(Y=1, lowest=6000, loess.span=.2, what="area", upper=0.4, repetitions=1, "Australia")
-# as(Y=1, lowest=6000, loess.span=.2, what="area", upper=0.4, repetitions=1, "North America")
-# as(Y=1, lowest=7000, loess.span=.2, what="area", upper=0.1, repetitions=1, "Papuan")
-
+# mean rates across areas (Fig. 1)
+as(Y=1, lowest=7000, loess.span=.15, upper=2, present=300, what="areas")
+# Mean diffusion across biomes (Fig. 2)
+as(what="biomes")
+# ratio of EW to SW movements across areas (Fig. 3)
+as(what="bearings_areas")
+# mean rates across subsistence patterns (Fig. 4)
+as(Y=1, lowest=5000, loess.span=.2, upper=0.9, present=300, what="subsistence")
+# print Pearson and Spearman correlations between speed and 
+# altitude, rugosity, and npp
+as(what="continuous_variables")
+# Ratios of EW to NS movements for AGR vs. HG languages (Fig. S1)
+as(what="bearings_subsistence")
 
 # as stands for average speed
-as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, present=300, repetitions=10, area, ...) {
+as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, present=300, ...) {
 
   ### data preparation ###
   if (exists("Y") == FALSE) {
@@ -86,23 +70,27 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 		de <- de[-w_na,]
 	}
 
+	### function for creating a transparent color when plotting
+	create_col <- function(color, percent = 50, name = NULL) {
+	  rgb.val <- col2rgb(color)
+	  t.col <- rgb(rgb.val[1], rgb.val[2], rgb.val[3], 
+	               max = 255,
+	               alpha = (100 - percent) * 255 / 100,
+	               names = name)
+	  return(t.col)
+	}
+	
 	### areas ###
   if ( what=="areas" ) {
+    # from outside the function runs as as(Y=1, lowest=7000, loess.span=.15, upper=2, present=300, what="areas")
     areas <- sort(unique(de$area))
     w_uniden <- which(areas=="unidentified")
     if ( length(w_uniden) > 0 ) {
       areas <- areas[-w_uniden]
     }
-    nareas <- length(areas)
-    colors <- c("blue","red","green3","darkorchid1","orange","maroon1","lightsalmon3")
-    linetypes <- c(1,1,1,1,1,1,1)
-    plot(100, 100, xlim=c(-lowest,0), ylim=c(0,upper), xlab="BP", ylab="km/year")
-    rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#EBEBEB")
-    abline(v=seq(-lowest,0,200), h=seq(0,upper,0.1), col="white")
-    legend((-lowest), upper, areas, cex=1, col=colors, lty=linetypes, lwd=3)
     for ( a in 1:length(areas) ) {
       filename <- paste("diffusion_averages_", areas[a], "_", Y, "_year_period.txt", sep="")
-      cat("lower_bound\taverage_speed\tmedian_speed\tN\n", file=filename)
+      cat("lower_bound\tmean_speed\tmean_speed_from\tmean_speed_to\tN\n", file=filename)
       de_sub <- de[which(de$area==areas[a]),]
       lower <- lowest
       while ( lower >= present ) {
@@ -111,23 +99,52 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
         window.edge <- lower - Y
         w_in <- which( !((BPM < lower & BPD < window.edge) | (BPM > lower & BPD > window.edge)) )
         if ( length(w_in)==0 ) {
-          cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="")
-          cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
+          cat(lower, "\t", NA, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="")
+          cat(lower, "\t", NA, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
         } else {
-          speed_average <- mean(as.numeric(de_sub$speed[w_in]))
-          speed_median <- median(as.numeric(de_sub$speed[w_in]))
-          cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="")
-          cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
+          mean_speed <- mean(as.numeric(de_sub$speed[w_in]))
+          mean_speed_from <- mean(as.numeric(de_sub$speed_from[w_in]))
+          mean_speed_to <- mean(as.numeric(de_sub$speed_to[w_in]))
+          cat(lower, "\t", mean_speed, "\t", mean_speed_from, "\t", mean_speed_to, "\t", length(w_in), "\n", sep="")
+          cat(lower, "\t", mean_speed, "\t", mean_speed_from, "\t", mean_speed_to, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
         }
         lower <- lower - Y
       }
+    }
+    nareas <- length(areas)
+    colors <- c("blue","red","green3","darkorchid1","orange","maroon1","lightsalmon3")
+    linetypes <- c(1,1,1,1,1,1,1)
+    plot(100, 100, xlim=c(-lowest,0), ylim=c(0,upper), xlab="BP", ylab="km/year")
+    rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#EBEBEB")
+    abline(v=seq(-lowest,0,200), h=seq(0,upper,0.1), col="white")
+    legend((-lowest), upper, areas, cex=1, col=colors, lty=linetypes, lwd=3)
+    # plot with lines only
+    for ( a in 1:length(areas) ) {
+      filename <- paste("diffusion_averages_", areas[a], "_", Y, "_year_period.txt", sep="")
       plot_data <- read.table(file=filename, header=TRUE, sep="\t")
-      w_na2 <- unique(union(which(is.na(plot_data$average_speed)), which(is.na(plot_data$median_speed))))
+      w_na2 <- which(is.na(plot_data$mean_speed))
       if ( length(w_na2) > 0 ) {
         plot_data <- plot_data[-w_na2,]
       }
       plot_data$lower_bound <- -1*plot_data$lower_bound
-      lines(predict(loess(plot_data$average_speed ~ plot_data$lower_bound, span=loess.span)), x=plot_data$lower_bound, col=colors[a], lty=linetypes[a], lwd=4)
+      lines(predict(loess(plot_data$mean_speed ~ plot_data$lower_bound, 
+            span=loess.span)), x=plot_data$lower_bound, 
+            col=colors[a], lty=linetypes[a], lwd=4)
+    } # plot with error bars
+    for ( a in 1:length(areas) ) {
+      filename <- paste("diffusion_averages_", areas[a], "_", Y, "_year_period.txt", sep="")
+      plot_data <- read.table(file=filename, header=TRUE, sep="\t")
+      w_na2 <- which(is.na(plot_data$mean_speed))
+      if ( length(w_na2) > 0 ) {
+        plot_data <- plot_data[-w_na2,]
+      }
+      plot_data$lower_bound <- -1*plot_data$lower_bound
+      X <- plot_data$lower_bound
+      Yp <- predict(loess(plot_data$mean_speed ~ X, span=loess.span))
+      Yp2 <- predict(loess(plot_data$mean_speed_from ~ X, span=loess.span))
+      Yp3 <- predict(loess(plot_data$mean_speed_to ~ X, span=loess.span))
+      lines(X, Yp, col=colors[a], lty=linetypes[a], lwd=4)
+      polygon(c(X, rev(X)), c(Yp2,rev(Yp3)), col=create_col(colors[a], 90), border=NA)
     }
 
 	### biomes ###
@@ -145,7 +162,7 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 	  biome_key <- rbind(biome_key, (c(100, "Sea")))
 
     # define as "Sea" and code 100 biome4 where both biome4 and biome98 are "Sea"
-	  # as these values are changed a new dataframe is defined
+	  # as these values are changed a new data frame is defined
     de2 <- de
 	  sea <- intersect(which(de$biome4_names=="Sea"), which(de$biome98_names=="Sea"))
     nas <- setdiff(which(de$biome4_names=="Sea"), which(de$biome98_names=="Sea"))
@@ -185,21 +202,7 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 		for (i in 1:(L-1)) {
 			for (j in (i+1):L) {
 			  rawA <- as.numeric(x$speed[which(x$biome4==biomes[i])])
-			  # w_rawA_zero <- which(rawA==0)
-			  # rawApruned <- rawA
-			  # if (length(w_rawA_zero) > 0) {
-			  #   rawApruned[w_rawA_zero] <- 0.001
-			  # }
-				# A <- log(rawApruned)
-				
 				rawB <- as.numeric(x$speed[which(x$biome4==biomes[j])])
-				# w_rawB_zero <- which(rawB==0)
-				# rawBpruned <- rawB
-				# if (length(w_rawB_zero) > 0) {
-				#   rawBpruned[w_rawB_zero] <- 0.001
-				# }
-				# B <- log(rawBpruned)
-
 				res <- t.test(rawA, rawB, alternative="two.sided")
 				p <- res$p.value
 				  cat(designations[i], "\t", designations[j], "\t", mean(rawA), "\t", mean(rawB), "\t", p, "\n", file="t tests biomes.txt", append=TRUE)
@@ -210,35 +213,48 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 		# (using the 90% criterion)
 		# collect data in vectors to be merged with biome_keys
 		N <- c()
-		km <- c()
-		years <- c()
 		biome_rates <- c()
+		biome_rates_from <- c()
+		biome_rates_to <- c()
 		for ( i in 1:length(biomes) ) {
 		  ind <- which(x$biome4==biomes[i])
 		  N[i] <- length(ind)
-		  km[i] <- sum(x$distance[ind])
-		  years[i] <- sum(x$BP_mo[ind] - x$BP_da[ind])
-		  biome_rates[i] <- km[i]/years[i]
+		  biome_rates[i] <- mean(x$speed[ind])
+		  biome_rates_from[i] <- mean(x$speed_from[ind])
+		  biome_rates_to[i] <- mean(x$speed_to[ind])
 		}
 		
 		biome_rates_ranked <- biome_rates[order(biome_rates, decreasing=TRUE)]
+		biome_rates_from_ranked <- biome_rates_from[order(biome_rates, decreasing=TRUE)]
+		biome_rates_to_ranked <- biome_rates_to[order(biome_rates, decreasing=TRUE)]
 		biomes_ranked <- biomes[order(biome_rates, decreasing=TRUE)]
 		biome_descriptions_ranked <- biome_key$description[match(biomes_ranked, biome_key$key)]
 		N_ranked <- N[order(biome_rates, decreasing=TRUE)]
 		
-		biome_results_full <- data.frame(biome_rates_ranked, biomes_ranked, biome_descriptions_ranked, N_ranked)
-    biome_results <- biome_results_full[biome_results_full$N_ranked > 10,]
-				
+		biome_results_full <- data.frame(biome_rates_ranked, 
+		                                 biome_rates_from_ranked,
+		                                 biome_rates_to_ranked,
+		                                 biomes_ranked, 
+		                                 biome_descriptions_ranked, 
+		                                 N_ranked)
+		biome_results <- biome_results_full[biome_results_full$N_ranked > 10,]
+		
 		# plot mean diffusion rates across biomes
 		# colors that are just distinct, legend generated through defaults
 		pal <- brewer.pal(n = nrow(biome_results), name = "Paired")
-		barplot(biome_results$biome_rates_ranked, ylim=c(0,1), 
+		bp <- barplot(biome_results$biome_rates_ranked, ylim=c(0,8), 
 		        legend.text=biome_results$biome_descriptions_ranked, 
 		        col=pal, ylab="km/year")
-		
+
+		arrows95 <- arrows(x0=bp, x1=bp, y0=biome_results$biome_rates_from_ranked, 
+		                   y1=biome_results$biome_rates_to_ranked, angle=90, code=3, length=.15)
+		Ns <- paste("N = ", biome_results$N_ranked)
+		text(bp, biome_results$biome_rates_to_ranked, Ns, cex=.6, pos=3)
+
   ### subsistence ###
   } else if ( what=="subsistence") {
-		# assign subtypes of hunter-gatherers to HG
+    # from outside function run as as(Y=1, lowest=5000, loess.span=.2, upper=.9, present=300, what="subsistence")
+    # assign subtypes of hunter-gatherers to HG
 		for (i in 1:nrow(de)) {
 			if ( de$subsistence[i]=="HG-SED, HG-SAGO" ) { de$subsistence[i] <- "HG" }
 			if ( de$subsistence[i]=="HG-SAGO" ) { de$subsistence[i] <- "HG" }
@@ -247,17 +263,12 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 			if ( de$subsistence[i]=="HG-FISH" ) { de$subsistence[i] <- "HG" }
 		}
 	  # plot mean rates across subsistence patterns
-	  dev.off()
-		colors <- c("lightblue", "pink")
-		linetypes <- c(1,1)
-		subsist <- c("AGR", "HG")
-		plot(100, 100, xlim=c(-lowest,0), ylim=c(0,upper), xlab="BP", ylab="km/year")
-		rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#EBEBEB")
-		abline(v=seq(-lowest,0,200), h=seq(0,upper,0.1), col="white")
-		legend(-lowest, upper, subsist, cex=1.3, col=colors, lty=linetypes, lwd=3)
-		for ( a in 1:2 ) {
+    # prepare plotdata
+    subsist <- c("AGR", "HG")
+    for ( a in 1:2 ) {
 			filename <- paste("diffusion_averages_", subsist[a], "_", Y, "_year_period.txt", sep="")
-			cat("lower_bound\taverage_speed\tmedian_speed\tN\n", file=filename)
+			cat("lower_bound\taverage_speed\taverage_speed_from\taverage_speed_to\tN\n")
+			cat("lower_bound\taverage_speed\taverage_speed_from\taverage_speed_to\tN\n", file=filename)
 			de_sub <- de[which(de$subsistence==subsist[a]),]
 			lower <- lowest
 			while ( lower >= present ) {
@@ -270,20 +281,42 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 					cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
 				} else {
 					speed_average <- mean(as.numeric(de_sub$speed[w_in]))
-					speed_median <- median(as.numeric(de_sub$speed[w_in]))
-					cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="")
-					cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
+					speed_average_from <- mean(as.numeric(de_sub$speed_from[w_in]))
+					speed_average_to <- mean(as.numeric(de_sub$speed_to[w_in]))
+					cat(lower, "\t", speed_average, "\t", speed_average_from, "\t", speed_average_to, "\t", length(w_in), "\n", sep="")
+					cat(lower, "\t", speed_average, "\t", speed_average_from, "\t", speed_average_to, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
 				}
 				lower <- lower - Y
 			}
-			plot_data <- read.table(file=filename, header=TRUE, sep="\t")
+    }
+    # prepare plot background
+    dev.off()
+    colors <- c("lightblue", "pink", "blue", "red")
+    linetypes <- c(1,1)
+    plot(100, 100, xlim=c(-lowest,0), ylim=c(0,upper), xlab="BP", ylab="km/year")
+    rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = "#EBEBEB")
+    abline(v=seq(-lowest,0,200), h=seq(0,1,0.1), col="white")
+    legend(-lowest, upper, subsist, cex=1.3, col=colors[3:4], lty=linetypes, lwd=3)
+    # plotting
+		for ( a in 1:2 ) {
+		  filename <- paste("diffusion_averages_", subsist[a], "_", Y, "_year_period.txt", sep="")
+		  plot_data <- read.table(file=filename, header=TRUE, sep="\t")
 			w_na2 <- unique(union(which(is.na(plot_data$average_speed)), which(is.na(plot_data$median_speed))))
 			if ( length(w_na2) > 0 ) {
 				plot_data <- plot_data[-w_na2,]
 			}
 			plot_data$lower_bound <- -1*plot_data$lower_bound
-			lines(predict(loess(plot_data$average_speed ~ plot_data$lower_bound, span=loess.span)), 
-			      x=plot_data$lower_bound, col=colors[a], lty=linetypes[a], lwd=4)
+			
+			X <- plot_data$lower_bound
+			Y1 <- predict(loess(plot_data$average_speed ~ X, span=loess.span))
+      lines(X, Y1, col=colors[a+2], lty=linetypes[a], lwd=4)
+      Y2 <- predict(loess(plot_data$average_speed_from ~ X, span=loess.span))
+      # in case a line is wanted for the lower bound
+      # lines(X, Y2, col=colors[a], lty=linetypes[a], lwd=4)
+      Y3 <- predict(loess(plot_data$average_speed_to ~ X, span=loess.span))
+      # in case a line is wanted for the upper bound
+      # lines(X, Y3, col=colors[a], lty=linetypes[a], lwd=4)
+      polygon(c(X, rev(X)), c(Y2,rev(Y3)), col=create_col(colors[a+2], 70), border=NA)
 		}
 
 	### bearings and areas ###
@@ -297,18 +330,31 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 	    mab[1,i] <- length(intersect(w_area,EW))
 	    mab[2,i] <- length(intersect(w_area,NS))
 	  }
-    bearing_ratios_areas <- mab[1,]/mab[2,]
-    print(bearing_ratios_areas)
-    # make barplot similar to the one for bearings_subsistence but 
-    # hardwired colors same as those of diffusion rates
-    abbr1 <- names(bearing_ratios_areas)
-    abbr2 <- gsub("North", "N.", abbr1)
-    abbr3 <- gsub("South", "S.", abbr2)
-    names(bearing_ratios_areas) <- abbr3
-    colors <- c("blue","red","green3","darkorchid1","orange","maroon1","lightsalmon3")
-	  barplot(bearing_ratios_areas, ylab="ratio of EW to NS movements", 
-	          col=colors, xlim=NULL, ylim=c(0,1.6))
-	  abline(1, 0, col="black", lty=2)
+	  # make barplot similar to the one for bearings_subsistence but 
+	  # hardwired colors same as those of diffusion rates
+	  # order the matrix by descending proportions
+	  ord <- order(mab[1,]/(mab[1,] + mab[2,]), decreasing=TRUE)
+    mab_ord <- mab[,ord]
+    # prepare data for a column for the World
+    World <- apply(mab_ord, 1, sum)
+    mab_ord <- as.matrix(data.frame(mab_ord, World))
+    bearing_proportions_areas <- 100*(mab_ord[1,]/(mab_ord[1,] + mab_ord[2,]))
+    abbr1 <- names(bearing_proportions_areas)
+	  abbr2 <- gsub("North\\.", "N. ", abbr1)
+	  abbr3 <- gsub("South\\.", "S. ", abbr2)
+	  names(bearing_proportions_areas) <- abbr3
+	  # calculate margins of error
+	  n <- apply(mab_ord, 2, sum)
+	  moe95 <- 100*1.96*sqrt(((bearing_proportions_areas/100)*(1-bearing_proportions_areas/100))/n)
+	  # make a text vector of sample sizes
+	  ss <- paste0("n=",n)
+	  colors <- c(c("blue","red","green3","darkorchid1","orange","maroon1","lightsalmon3")[ord],"gray")
+	  bp <- barplot(bearing_proportions_areas, ylab="proportion (%) of EW to NS movements", 
+	     col=colors, xlim=NULL, ylim=c(0,70))
+	  abline(50, 0, col="black", lty=2)
+	  arrows95 <- arrows(x0=bp, x1=bp, y0=bearing_proportions_areas-moe95, 
+	         y1=bearing_proportions_areas+moe95, angle=90, code=3, length=.15)
+    text(bp, 1, ss, cex=1, pos=3)
 	  # do pairwise chi-square tests for all pairs of areas
 	  ab_chisq <- matrix(100,ncol=length(afb),nrow=length(afb),dimnames=list(afb,afb))
 	  for (i in 1:ncol(ab_chisq)) {
@@ -379,196 +425,32 @@ as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, presen
 	    AGR_NS <- length(which(de$subsistence=="AGR" & de$bearing=="NS"))
 	    HG_EW <- length(which(de$subsistence=="HG" & de$bearing=="EW"))
 	    HG_NS <- length(which(de$subsistence=="HG" & de$bearing=="NS"))
-	    bearing_ratios <- c(AGR_EW/AGR_NS, HG_EW/HG_NS)
+	    # bearing_ratios <- c(AGR_EW/AGR_NS, HG_EW/HG_NS)
+	    bearing_proportions <- 100*c(AGR_EW/(AGR_EW+AGR_NS), HG_EW/(HG_EW+HG_NS))
 	    # dev.off()
 	    par(mfrow =c(1,2))
-	    barplot(bearing_ratios, ylab="ratio of EW to NS movements", col=c("lightblue", "pink"), 
-	            ylim=c(0,1.6), space=c(1,.2), beside=TRUE, width=c(15,15))
-	    # text(bearing_ratios + .08, paste("N =", c(sum(AGR_EW, AGR_NS), sum(HG_EW, HG_NS))), cex=1) 
-	    legend("top", c("AGR" ,"HG"), fill = c("lightblue","pink"))
-	    abline(1, 0, col="black", lty=2)
-	    resetPar()
+	    # bp <- barplot(bearing_ratios, ylab="ratio of EW to NS movements", col=c("lightblue", "pink"), 
+	    #         ylim=c(0,1.6), space=c(1,.2), beside=TRUE, width=c(15,15))
+	    n <- c(AGR_EW+AGR_NS, HG_EW+HG_NS)
+	    moe95 <- 100*1.96*sqrt(((bearing_proportions/100)*(1-bearing_proportions/100))/n)
+	    col_AGR <- create_col("blue", percent = 70, name = NULL)
+	    col_HG <- create_col("red", percent = 70, name = NULL)
+	    bp <- barplot(bearing_proportions, ylab="proportion (%) of EW to NS movements", col=c(col_AGR, col_HG), 
+	           ylim=c(0,70), space=c(1,.2), beside=TRUE, width=c(15,15))
+	    legend("top", c("AGR" ,"HG"), fill = c(col_AGR,col_HG))
+
+	    # bp <- barplot(bearing_proportions, ylab="proportion (%) of EW to NS movements", col=c("lightblue", "pink"), 
+	    #             ylim=c(0,70), space=c(1,.2), beside=TRUE, width=c(15,15))
+	    # legend("top", c("AGR" ,"HG"), fill = c("lightblue","pink"))
+
+	    abline(50, 0, col="black", lty=2)
+	    arrows95 <- arrows(x0=bp, x1=bp, y0=bearing_proportions-moe95, y1=bearing_proportions+moe95, angle=90, code=3, length=.15)
+	    ss <- paste0("n=",n)
+	    text(bp, 1, ss, cex=1, pos=3)
+	    # resetPar()
 	    # do a chi-square test of differences between HG and AGR
 	    chisq.test(c(AGR_EW,HG_EW),c(AGR_NS,HG_NS))
 	
-	    ### area ###
-	} else if ( what=="area") {
-	  de_sub <- de[which(de$area==area),]
-	  plotfile.name <- paste0(area, "_with_", repetitions, "_calibration_noise_curves.pdf")
-	  pdf(plotfile.name)
-	  plot(100, 100, xlim=c(-lowest,min(de_sub$BP_da)), ylim=c(0,upper), main=area, xlab="BP", ylab="km/year")
-	  # the following plots lines for dates sampled within their calibration error ranges
-	  for (r in 1:repetitions) {
-	    filename <- paste("diffusion_averages_", area, "_", Y, "_year_period.txt", sep="")
-	    cat("lower_bound\taverage_speed\tmedian_speed\tN\n", file=filename)
-	    lower <- lowest
-	    while ( lower >= Y ) {
-	      BPM <- as.numeric(de_sub$BP_mo)
-	      BPD <- as.numeric(de_sub$BP_da)
-	      BPM_new <- rep(NA, length(BPM))
-	      BPD_new <- rep(NA, length(BPD))
-	      new <- function(M, D) {
-	        M_low <- round(M - .29*M)
-	        M_hi <- round(M + .29*M)
-	        M_new <- sample(M_low:M_hi, 1)
-	        D_low <- round(D - .29*D)
-	        D_hi <- round(D + .29*D)
-	        if (D_hi >= M_new) {
-	          D_hi <- M_new - 1
-	        }
-	        D_new <- sample(D_low:D_hi, 1)
-	        return(c(M_new, D_new))
-	      }
-	      for (i in 1:length(BPM)) {
-	        new_out <- new(BPM[i],BPD[i])
-	        BPM_new[i] <- new_out[1]
-	        BPD_new[i] <- new_out[2]
-	      }
-	      window.edge <- lower - Y
-	      w_in <- which( !((BPM_new < lower & BPD_new < window.edge) | (BPM_new > lower & BPD_new > window.edge)) )
-	      if ( length(w_in)==0 ) {
-	        cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="")
-	        cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
-	      } else {
-	        speed_average <- round(mean(as.numeric(de_sub$distance[w_in])/(BPM_new[w_in] - BPD_new[w_in])),3)
-	        # speed_average <- mean(as.numeric(de_sub$speed[w_in]))
-	        speed_median <- round(median(as.numeric(de_sub$distance[w_in])/(BPM_new[w_in] - BPD_new[w_in])),3)
-	        cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
-	      }
-	      lower <- lower - Y
-	    }
-	    plot_data <- read.table(file=filename, header=TRUE, sep="\t")
-	    w_na2 <- unique(union(which(is.na(plot_data$average_speed)), which(is.na(plot_data$median_speed))))
-	    if ( length(w_na2) > 0 ) {
-	      plot_data <- plot_data[-w_na2,]
-	    }
-	    plot_data$lower_bound <- -1*plot_data$lower_bound
-	    lines(predict(loess(plot_data$average_speed ~ plot_data$lower_bound, span=loess.span)), x=plot_data$lower_bound, lty=1, lwd=1)
-	    par(new=TRUE)
-	  }
-	  # the following plots the original, unsampled data
-	  filename <- paste("diffusion_averages_", area, "_", Y, "_year_period.txt", sep="")
-	  cat("lower_bound\taverage_speed\tmedian_speed\tN\n", file=filename)
-	  de_sub <- de[which(de$area==area),]
-	  lower <- lowest
-	  while ( lower >= Y ) {
-	    BPM <- as.numeric(de_sub$BP_mo)
-	    BPD <- as.numeric(de_sub$BP_da)
-	    window.edge <- lower - Y
-	    w_in <- which( !((BPM < lower & BPD < window.edge) | (BPM > lower & BPD > window.edge)) )
-	    if ( length(w_in)==0 ) {
-	      cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="")
-	      cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
-	    } else {
-	      speed_average <- mean(as.numeric(de_sub$speed[w_in]))
-	      speed_median <- median(as.numeric(de_sub$speed[w_in]))
-	      cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
-	    }
-	    lower <- lower - Y
-	  }
-	  plot_data <- read.table(file=filename, header=TRUE, sep="\t")
-	  w_na2 <- unique(union(which(is.na(plot_data$average_speed)), which(is.na(plot_data$median_speed))))
-	  if ( length(w_na2) > 0 ) {
-	    plot_data <- plot_data[-w_na2,]
-	  }
-	  plot_data$lower_bound <- -1*plot_data$lower_bound
-	  lines(predict(loess(plot_data$average_speed ~ plot_data$lower_bound, span=loess.span)), x=plot_data$lower_bound, lty=1, lwd=3, col="red")
-	  grid(nx = NA,
-	       ny = NULL,
-	       lty = 2, col = "gray", lwd = 2)
-	  rug(-1*de_sub$BP_mo)
-	  dev.off()
-	  
-	### world ###
-	} else if ( what=="world" ) {
-	      lower <- lowest
-	      while ( lower >= Y ) {
-	        # w_in <- which(as.numeric(de$BP_M) < lower & as.numeric(de$BP_D) > (lower - Y))
-	        BPM <- as.numeric(de$BP_mo)
-	        BPD <- as.numeric(de$BP_da)
-	        window.edge <- lower - Y
-	        w_in <- which( !((BPM < lower & BPD < window.edge) | (BPM > lower & BPD > window.edge)) )
-	        if ( length(w_in)==0 ) {
-	          # cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="")
-	          cat(lower, "\t", NA, "\t", NA, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
-	        } else {
-	          speed_average <- mean(as.numeric(de$speed[w_in]))
-	          speed_median <- median(as.numeric(de$speed[w_in]))
-	          # cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="")
-	          cat(lower, "\t", speed_average, "\t", speed_median, "\t", length(w_in), "\n", sep="", file=filename, append=TRUE)
-	        }
-	        lower <- lower - Y
-	      }
-	      plot_data <- read.table(file=filename, header=TRUE, sep="\t")
-	      w_na2 <- unique(union(which(is.na(plot_data$average_speed)), which(is.na(plot_data$median_speed))))
-	      if ( length(w_na2) > 0 ) {
-	        plot_data <- plot_data[-w_na2,]
-	      }
-	      plot_data$lower_bound <- -1*plot_data$lower_bound
-	      par(mfrow = c(2,1))
-	      plot(plot_data$lower_bound, plot_data$average_speed, main="Mean", xlab="BP", ylab="km/year")
-	      lines(predict(loess(plot_data$average_speed ~ plot_data$lower_bound, span=loess.span)), x=plot_data$lower_bound, col='red')
-	      abline(h = 1, col="blue", lty=2)
-	      plot(plot_data$lower_bound, plot_data$median_speed, main="Median", xlab="BP", ylab="km/year")
-	      lines(predict(loess(plot_data$median_speed ~ plot_data$lower_bound, span=loess.span)), x=plot_data$lower_bound, col='red')
-	      abline(h = 1, col="blue", lty=2)
-	      de <- de[order(de$BP_mo, decreasing=TRUE),]
-	      write.table(de, sep=",", file="migration_events_data.csv")
-	      
-  ### latitudes ###
-	} else if (what=="latitudes") {
-	  # check if diffusion rates are related to latitude
-	  touch <- function(latw1, latw2, latt1, latt2) {
-	    if (latt1 < latw1 & latt2 < latw1) {return(FALSE)}
-	    else if (latt1 > latw2 & latt2 > latw2) {return(FALSE)}
-	    else {return(TRUE)}
-	  }
-	  max_lat <- ceiling(max(c(de$lat_da, de$lat_mo)))
-	  min_lat <- floor(min(c(de$lat_da, de$lat_mo)))
-	  lat <- c(min_lat:(max_lat-1))
-	  L <- length(lat)
-	  speed <- rep(NA, L)
-    speed_table <- data.frame(lat, speed)
-	  speed_list <- list()
-	  counter <- 0
-	  for (i in min_lat:(max_lat-1)) {
-	    counter <- counter + 1
-	    if (counter %% 10 == 0) {
-	      cat("doing", counter, "out of", max_lat - min_lat, "\n")
-	    }
-	    latw1 <- i
-	    latw2 <- i+1
-	    for (j in 1:nrow(de)) {
-	      lat_mo <- de$lat_mo[j]
-	      lat_da <- de$lat_da[j]
-        sorted <- sort(c(lat_mo, lat_da))
-	      latt1 <- sorted[1]  # latt stands for target latitude
-	      latt2 <- sorted[2]
-	      touches <- touch(latw1, latw2, latt2, latt2)
-	      if (touches) {
-	        if (length(speed_list) >= counter) {
-	          speed_list[[counter]] <- c(speed_list[[counter]], de$speed[j])
-	        } else {
-	          speed_list[[counter]] <- de$speed[j]
-	        }
-	      }
-	    }
-	  }
-	  cat("\nnow averaging rates\n\n")
-	  for (k in 1:length(speed_list)) {
-	    if (length(speed_list[[k]]) > 0) {
-	      speed_table$speed[k] <- mean(speed_list[[k]])
-	    }
-	  }
-	  southern_lats <- which(speed_table$lat < 0)
-	  northern_lats <- which(speed_table$lat >= 0)
-	  southern <- speed_table[southern_lats,]
-	  southern$lat <- southern$lat * -1
-	  northern <- speed_table[northern_lats,]
-	  plot(northern$lat, northern$speed, xlab="latitudes north", ylab="km/year")
-	  abline(lm(northern$speed ~ northern$lat))
-	  plot(southern$lat, southern$speed, xlab="latitudes south", ylab="km/year")
-	  abline(lm(southern$speed ~ southern$lat))
 	} else {
 		cat("not specified what to plot\n")
 	}
