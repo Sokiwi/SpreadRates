@@ -19,11 +19,11 @@ as(what="biomes")
 as(what="bearings_areas")
 # mean rates across subsistence patterns (Fig. 4)
 as(Y=1, lowest=5000, loess.span=.2, upper=0.9, present=300, what="subsistence")
+# Ratios of EW to NS movements for AGR vs. HG languages (Fig. 5)
+as(what="bearings_subsistence")
 # print Pearson and Spearman correlations between speed and 
 # altitude, rugosity, and npp
 as(what="continuous_variables")
-# Ratios of EW to NS movements for AGR vs. HG languages (Fig. S1)
-as(what="bearings_subsistence")
 
 # as stands for average speed
 as <- function(Y=200, lowest=7000, loess.span=.5, what="world", upper=10, present=300, ...) {
