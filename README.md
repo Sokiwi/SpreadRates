@@ -1,2 +1,2 @@
 # SpreadRates
-R code and instructions for running it for a paper on language diffusion rates. The file Pipeline.pdf explains how the paper's results are replicated step by step.
+R code and associated files for a paper on language diffusion rates.
